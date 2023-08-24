@@ -18,6 +18,7 @@ describe('CurrenciesService', () => {
       getCurrency: jest.fn(),
       createCurrency: jest.fn(),
       updateCurrency: jest.fn(),
+      deleteCurrency: jest.fn(),
     };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -86,8 +87,8 @@ describe('CurrenciesService', () => {
       );
     });
     it('should be return whenrepository return', async () => {
-      (repository.getCurrency as jest.Mock).mockReturnValue(mockData);
-      expect(await service.getCurrency('USD')).toEqual(mockData);
+      (repository.createCurrency as jest.Mock).mockReturnValue(mockData);
+      expect(await service.createCurrency(mockData)).toEqual(mockData);
     });
   });
   describe('updateCurrency()', () => {
@@ -106,6 +107,36 @@ describe('CurrenciesService', () => {
     it('should be called repository with correct params', async () => {
       await service.updateCurrency(mockData);
       expect(repository.updateCurrency).toBeCalledWith(mockData);
+    });
+    it('should be throw if value <= 0', async () => {
+      mockData.value = 0;
+      await expect(service.updateCurrency(mockData)).rejects.toThrow(
+        new BadRequestException('The value must be greater zero.'),
+      );
+    });
+    it('should be return when repository return', async () => {
+      (repository.updateCurrency as jest.Mock).mockReturnValue(mockData);
+      expect(await service.updateCurrency(mockData)).toEqual(mockData);
+    });
+  });
+  describe('DeleteCurrency()', () => {
+    it('should be throw if repository throw', async () => {
+      (repository.deleteCurrency as jest.Mock).mockRejectedValue(
+        new InternalServerErrorException(),
+      );
+      mockData.currency = 'INVALID';
+      await expect(service.deleteCurrency(mockData.currency)).rejects.toThrow(
+        new InternalServerErrorException(),
+      );
+    });
+    it('should be not throw if repository returns', async () => {
+      await expect(
+        service.deleteCurrency(mockData.currency),
+      ).resolves.not.toThrow();
+    });
+    it('should be called repository with correct params', async () => {
+      await service.deleteCurrency(mockData.currency);
+      expect(repository.deleteCurrency).toBeCalledWith(mockData.currency);
     });
   });
 });
