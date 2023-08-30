@@ -5,7 +5,6 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { CurrenciesRepository } from './currencies.repository';
-import { Currencies } from './currencies.entity';
 
 describe('CurrenciesService', () => {
   let service: CurrenciesService;
@@ -13,7 +12,7 @@ describe('CurrenciesService', () => {
   let mockData = {
     currency: 'USD',
     value: 1,
-  } as Currencies;
+  };
 
   beforeEach(async () => {
     const currenciesRepositoryMock = {
